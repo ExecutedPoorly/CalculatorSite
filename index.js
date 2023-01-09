@@ -9,32 +9,130 @@ const ScreenBtm = document.querySelector("#ScreenBtm");
 const Equals = document.querySelector("#equalall");
 const Backspace = document.querySelector("#backspace");
 const Dot = document.querySelector("#dot");
-
+let LastHit = "";
 let LastOperator = "0";
-let CurrentOperator = "0";
-let CurrentNumber = "0";
+let CurrentOperator = "";
+let CurrentNumber = "";
 let PreviousNumber = ""; //must stay empty or errors appear;
 let MemoryNumber = 10; //displayed at top of screen
-let LastInput = 
+let LastInput = "";
+
+function NumberPressed(x) {
+  LastHit = "Number";
+
+  CurrentNumber += x.innerHTML;
+  LastOperator = CurrentOperator;
+  RefreshUI();
+}
+function OperatorPressed(x) {
+  LastHit = "Operator";
+  CurrentOperator = x.innerHTML;
+  if (x.innerHTML === "+/-") {
+    if (CurrentNumber == 0) {
+      Error("Enter a value");
+    }
+    else {
+      SwapNegative();
+    }
+  }
+  else if (PreviousNumber != "" || LastOperator == "÷") {
+    operator(x.innerHTML, "idk");
+  }
+
+  else {
+    console.log("Operator hit", LastOperator);
+    PreviousNumber = parseFloat(CurrentNumber);
+    CurrentNumber = "";
+    RefreshUI();
+  }
+}
+
+function operator(x) {
+
+  if (LastOperator == "÷") { //divison
+    if (CurrentNumber == 0 || CurrentNumber == "")
+      Error("DivideByZero", CurrentNumber, PreviousNumber);
+    else if (PreviousNumber == 0) {
+      CurrentNumber = "";
+      PreviousNumber = 0;
+      RefreshUI();
+    }
+    else if (CurrentOperator != "") {
+      PreviousNumber = (parseFloat(PreviousNumber) / parseFloat(CurrentNumber));
+      RefreshUI();
+    }
+
+  }
+  else if (LastOperator == "x" && CurrentOperator != "") { //multiplication
+    if (CurrentNumber == ""){
+      return;
+    }
+    else {
+    PreviousNumber = (parseFloat(CurrentNumber) * parseFloat(PreviousNumber));
+    CurrentNumber = "";
+    RefreshUI();
+    }
+
+  }
+  else if (LastOperator == "-" && CurrentOperator != "") { //subtract
+    PreviousNumber = (parseFloat(CurrentNumber) - parseFloat(PreviousNumber));
+    CurrentNumber = "";
+    RefreshUI();
+  }
+  else if (LastOperator == "+" && CurrentOperator != "") { //subtract
+    PreviousNumber = (parseFloat(CurrentNumber) + parseFloat(PreviousNumber));
+    CurrentNumber = "";
+    RefreshUI();
+  }
+}
+function SwapNegative() {
+  CurrentNumber = (parseFloat(CurrentNumber) * -1).toString();
+  console.log(typeof CurrentNumber);
+  RefreshUI();
+}
+
+function RefreshUI() {
+  //console.log("ran", PreviousNumber, CurrentNumber );
+  ScreenTop.innerHTML = PreviousNumber;
+  ScreenBtm.innerHTML = CurrentNumber;
+  console.log(CurrentNumber, "CurrentNumberRefresh");
+}
+
+function Error(x) {
+  if (x == "DivideByZero") {
+    alert("Can not Divide by Zero!");
+    CurrentNumber = "";
+    CurrentOperator = "÷";
+  }
+  else if (x == "Enter a value") {
+    alert("Enter a value first");
+    CurrentNumber = "";
+    RefreshUI();
+  }
+}
+
+
+
 ///event listeners--------------------------------------------------
 ClearAll.addEventListener('click', function() {
-  Total = "0", CurrentNumber = "0", MemoryNumber = "0", PreviousNumber = "";//empty 
+  Total = "0", CurrentNumber = "", MemoryNumber = "0", PreviousNumber = "";//empty 
   RefreshUI();
 });
 
 Dot.addEventListener('click', function() {
-  if (CurrentNumber.includes(".")){
-    console.log("periodss");
+  if (CurrentNumber.includes(".")) { //checks if period exists.
   }
-  else{
-    CurrentNumber+= ".";
+  else {
+    CurrentNumber += ".";
   }
   RefreshUI();
 });
 
 Backspace.addEventListener('click', function() {
-  if (CurrentNumber)
   CurrentNumber = CurrentNumber.substring(0, CurrentNumber.length - 1);
+  if (CurrentNumber == "-") {
+    CurrentNumber = "";
+  }
   console.log(CurrentNumber);
   RefreshUI();
 });
@@ -53,111 +151,3 @@ Operators.forEach((OperatorButton) =>
     OperatorPressed(OperatorButton);
   }));
 ///event listeners ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-function NumberPressed(x) {
-
-  CurrentNumber += x.innerHTML;
-  LastOperator = CurrentOperator;
-  RefreshUI();
-}
-function OperatorPressed(x) {
-
-  CurrentOperator = x.innerHTML;
-  if (x.innerHTML === "+/-") {
-    if (CurrentNumber == 0) {
-      Error("Enter a value");
-    }
-    else {
-      SwapNegative();
-    }
-  }    
-  else if (PreviousNumber != "" || LastOperator == "÷") {
-    operator(x.innerHTML, "idk");
-  }
-    
-  else {
-    console.log("ERROR ERROR ERROR", LastOperator);
-    PreviousNumber = parseFloat(CurrentNumber);
-    CurrentNumber = "0";
-    RefreshUI();
-  }
-}
-
-function operator(x) {
-
-  if (LastOperator == "÷") { //divison
-    if (CurrentNumber == 0)
-      Error("DivideByZero");
-    else if (PreviousNumber == 0) {
-      CurrentNumber = "";
-      PreviousNumber = 0;
-      RefreshUI();
-    }
-    else {
-      console.log("divvy");
-      PreviousNumber = (parseFloat(PreviousNumber) / parseFloat(CurrentNumber));
-      RefreshUI();
-    }
-
-  }
-  else if (LastOperator == "x") { //multiplication
-    PreviousNumber = (CurrentNumber * PreviousNumber);
-    CurrentNumber = 0;
-    RefreshUI();
-  }
-  else if (LastOperator == "-") { //subtract
-    PreviousNumber = (PreviousNumber - CurrentNumber);
-    CurrentNumber = 0;
-    RefreshUI();
-  }
-  else if (LastOperator == "+") { //subtract
-    PreviousNumber = (PreviousNumber + CurrentNumber);
-    CurrentNumber = 0;
-    RefreshUI();
-  }
-  // else if (x=="x"){
-  //   PreviousNumber = (parseInt(PreviousNumber) * parseInt(CurrentNumber));
-  //   CurrentNumber = "";
-  //   RefreshUI();
-  // }
-  // else {
-  //   pass;
-  // }
-}
-function SwapNegative() {
-  CurrentNumber = (parseFloat(CurrentNumber) * -1).toString();
-  console.log(typeof CurrentNumber);
-  RefreshUI();
-}
-
-function RefreshUI() {
-  //console.log("ran", PreviousNumber, CurrentNumber );
-  ScreenTop.innerHTML = PreviousNumber;
-  ScreenBtm.innerHTML = CurrentNumber;
-  console.log(CurrentNumber);
-}
-
-function Error(x) {
-  if (x == "DivideByZero") {
-    alert("Can not Divide by Zero!");
-    CurrentNumber = "";
-    CurrentOperator = "÷";
-  }
-  else if (x == "Enter a value") {
-    alert("Enter a value first");
-    CurrentNumber = "";
-    RefreshUI();
-  }
-}
-function RemoveHyphen(){
-    if (CurrentNumber=="-") {
-      console.log("ddddddddddd");
-      CurrentNumber="";
-      RefreshUI();}
-    else if (PreviousNumber=="-") {
-      console.log("ddddddddddd");
-      PreviousNumber = "";
-      RefreshUI();
-    }  
-}
-
