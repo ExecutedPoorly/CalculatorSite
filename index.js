@@ -59,6 +59,7 @@ function operator(x) {
     }
     else if (CurrentOperator != "") {
       PreviousNumber = (parseFloat(PreviousNumber) / parseFloat(CurrentNumber));
+      CurrentNumber = ""; //removing this, repeats the same operation with the same 'current value'
       RefreshUI();
     }
 
