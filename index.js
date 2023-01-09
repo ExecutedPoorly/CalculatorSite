@@ -48,7 +48,7 @@ function OperatorPressed(x) {
 }
 
 function operator(x) {
-
+  CheckForValidInput(); //Catches empty input fields.
   if (LastOperator == "÷") { //divison
     if (CurrentNumber == 0 || CurrentNumber == "")
       Error("DivideByZero", CurrentNumber, PreviousNumber);
@@ -64,13 +64,13 @@ function operator(x) {
 
   }
   else if (LastOperator == "x" && CurrentOperator != "") { //multiplication
-    if (CurrentNumber == ""){
+    if (CurrentNumber == "") {
       return;
     }
     else {
-    PreviousNumber = (parseFloat(CurrentNumber) * parseFloat(PreviousNumber));
-    CurrentNumber = "";
-    RefreshUI();
+      PreviousNumber = (parseFloat(CurrentNumber) * parseFloat(PreviousNumber));
+      CurrentNumber = "";
+      RefreshUI();
     }
 
   }
@@ -111,6 +111,12 @@ function Error(x) {
   }
 }
 
+function CheckForValidInput() {
+  if (CurrentNumber == "") {
+    console.log(CurrentNumber, "null");
+    return;
+  }
+}
 
 
 ///event listeners--------------------------------------------------
